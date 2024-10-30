@@ -1,10 +1,16 @@
-import 'dart:io';
-
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:tamadrop/features/download/download.dart';
+import 'package:tamadrop/features/player/video_player.dart';
 
+// TODO use Bloc pattern
+var youtubeVideoPath = "";
+var youtubeAudioPath = "";
 void main() {
+  // TODO delete
+  FFmpegKitConfig.enableLogCallback((log) {
+    print(log.getMessage());
+  });
   runApp(MyApp());
 }
 
@@ -27,34 +33,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _saveVideo(File videoFile, String videoTitle) async {
-    final appDocDir = await getApplicationDocumentsDirectory();
-    final savePath = appDocDir.path + '/$videoTitle.mp4';
-
-    final videoBytes = await videoFile.readAsBytes();
-    final File file = File(savePath);
-
-    await file.writeAsBytes(videoBytes);
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Successed!!")));
-  }
-
-  void _downloadVideo(String url) async {
-    var ytExplode = YoutubeExplode();
-    var video = await ytExplode.videos.get(url);
-
-    var manifest = await ytExplode.videos.streamsClient.getManifest(video);
-
-    var streamInfo = manifest.audioOnly.first;
-    var videoStream = manifest.video.first;
-
-    var audioStream = ytExplode.videos.streamsClient.get(streamInfo);
-    var videoFile = await ytExplode.videos.streamsClient.get(videoStream);
-
-    _saveVideo(videoFile, videoTitle);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               'Enter YouTube URL:',
               style: TextStyle(fontSize: 16),
             ),
@@ -79,19 +57,20 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             SizedBox(height: 20),
+            Download(),
             ElevatedButton(
               onPressed: () {
-                ElevatedButton(
-                  onPressed: () {
-                    String videoUrl =
-                        'https://www.youtube.com/watch?v=32ZbGBkWoeo'; // Replace with user input
-                    _downloadVideo(videoUrl);
-                  },
-                  child: Text('Download Video'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VideoPlayerContainer(
+                      videoPath: youtubeVideoPath,
+                    ),
+                  ),
                 );
               },
-              child: Text('Download Video'),
-            ),
+              child: Icon(Icons.play_arrow),
+            )
           ],
         ),
       ),
