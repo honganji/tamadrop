@@ -20,17 +20,17 @@ class DownloadVideoRepo implements VideoRepo {
     }
   }
 
-  @override
-  Future<LocalVideo?> downloadVideo(String url) async {
-    LocalVideo localVideo;
+  Future<String> _downloadVideo(
+    String url,
+    String appDocDir,
+    String time,
+    YoutubeExplode yt,
+  ) async {
     // Get the instance which holds video info
-    var yt = YoutubeExplode();
-    var time = DateTime.now().millisecondsSinceEpoch.toString();
     var video = await yt.videos.get(url);
     StreamManifest manifest = await yt.videos.streams.getManifest(video.id);
     if (manifest.audioOnly.isEmpty || manifest.videoOnly.isEmpty) {
-      print('No audio or video streams available for this video.');
-      return null;
+      throw Exception("No audio or video streams available for this video.");
     }
     var streamAudioInfo = manifest.audioOnly.withHighestBitrate();
     var streamVideoInfo = manifest.videoOnly.firstWhere(
@@ -41,17 +41,15 @@ class DownloadVideoRepo implements VideoRepo {
     var videoStream = yt.videos.streams.get(streamVideoInfo);
 
     // Define the file paths
-    // TODO deal with if there is the same video
-    var appDocDir = await getApplicationDocumentsDirectory();
-    final videoDir = Directory('${appDocDir.path}/videos');
+    final videoDir = Directory('$appDocDir/videos');
     if (!await videoDir.exists()) {
       await videoDir.create(recursive: true);
     }
     var audioFilePath = path.join(
-        appDocDir.path, '${video.id}_audio.${streamAudioInfo.container.name}');
+        appDocDir, '${video.id}_audio.${streamAudioInfo.container.name}');
     var videoFilePath = path.join(
-        appDocDir.path, '${video.id}_video.${streamVideoInfo.container.name}');
-    var outputFilePath = path.join(videoDir.path, '${time}.mp4');
+        appDocDir, '${video.id}_video.${streamVideoInfo.container.name}');
+    var outputFilePath = path.join(videoDir.path, '$time.mp4');
     var audioFile = File(audioFilePath);
     var videoFile = File(videoFilePath);
 
@@ -89,10 +87,16 @@ class DownloadVideoRepo implements VideoRepo {
     await audioFile.delete();
     await videoFile.delete();
 
-    yt.close();
+    return outputFilePath;
+  }
 
-    // Save thumnail image
-    final thumbnailDir = Directory('${appDocDir.path}/thumbnails');
+  Future<String> _downloadThumbnail(
+    String url,
+    String appDocDir,
+    Video video,
+    String time,
+  ) async {
+    final thumbnailDir = Directory('${appDocDir}/thumbnails');
     if (!await thumbnailDir.exists()) {
       await thumbnailDir.create(recursive: true);
     }
@@ -103,15 +107,28 @@ class DownloadVideoRepo implements VideoRepo {
     // Save the image to the local storage
     final thumbnailFile = File(thumbnailFilePath);
     await thumbnailFile.writeAsBytes(response.bodyBytes);
+    return thumbnailFilePath;
+  }
 
-    // hold the video information
+  @override
+  Future<LocalVideo?> downloadVideo(String url) async {
+    LocalVideo localVideo;
+    var yt = YoutubeExplode();
+    var video = await yt.videos.get(url);
+    var appDocDir = await getApplicationDocumentsDirectory();
+    var time = DateTime.now().millisecondsSinceEpoch.toString();
+    final videoPath = await _downloadVideo(url, appDocDir.path, time, yt);
+    final thumbnailPath =
+        await _downloadThumbnail(url, appDocDir.path, video, time);
+
+    yt.close();
     // TODO Get the size of the video file
     localVideo = LocalVideo(
       vid: time,
-      path: outputFilePath,
+      path: videoPath,
       playlistIDs: [],
       lastPlayedAt: DateTime.now(),
-      thumbnailFilePath: thumbnailFilePath,
+      thumbnailFilePath: thumbnailPath,
       title: video.title,
       volume: 1,
       length: video.duration?.inMinutes ?? 0,
