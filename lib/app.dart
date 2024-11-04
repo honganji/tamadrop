@@ -2,91 +2,72 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/download/data/download_video_repo.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
-import 'package:tamadrop/features/download/presentation/pages/download_page.dart';
-import 'package:tamadrop/features/player/video_player.dart';
+import 'package:tamadrop/features/layout/data/layout_change_repo.dart';
+import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
+import 'package:tamadrop/features/layout/presentation/pages/layout_page.dart';
+import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
+import 'package:tamadrop/features/storage/data/sqflite_storage_repo.dart';
 import 'package:tamadrop/features/themes/theme_cubit.dart';
 
 class MainApp extends StatelessWidget {
   final downloadVideoRepo = DownloadVideoRepo();
+  final layoutChangeRepo = LayoutChangeRepo();
+  final sqfliteStorageRepo = SqfliteStorageRepo();
   MainApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<ThemeCubit>(
-          create: (context) => ThemeCubit(),
-        ),
-        BlocProvider<VideoCubit>(
-          create: (context) => VideoCubit(downloadVideoRepo: downloadVideoRepo),
-        ),
-      ],
-      child: BlocBuilder<ThemeCubit, ThemeData>(
-        builder: (context, currentTheme) => MaterialApp(
-          title: 'YouTube Downloader',
-          theme: currentTheme,
-          home: MyHomePage(),
-        ),
-      ),
-    );
+  Future<void> initializeDB() async {
+    await sqfliteStorageRepo.initializeDB();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    final videoCubit = context.read<VideoCubit>();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('YouTube Downloader'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Enter YouTube URL:',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            Container(
-              width: 300,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'https://www.youtube.com/watch?v=...',
+    return FutureBuilder(
+        future: initializeDB(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Download(),
-            ElevatedButton(
-              onPressed: () {
-                if (videoCubit.localVideo != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VideoPlayerContainer(
-                        videoPath: videoCubit.localVideo!.path,
-                      ),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("There is no url of video"),
-                    ),
-                  );
-                }
-              },
-              child: Icon(Icons.play_arrow),
-            )
-          ],
-        ),
-      ),
-    );
+            );
+          } else if (snapshot.hasError) {
+            return const MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: Text('Error initializing database'),
+                ),
+              ),
+            );
+          } else {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider<ThemeCubit>(
+                  create: (context) => ThemeCubit(),
+                ),
+                BlocProvider<VideoCubit>(
+                  create: (context) => VideoCubit(
+                    downloadVideoRepo: downloadVideoRepo,
+                    storageRepo: sqfliteStorageRepo,
+                  ),
+                ),
+                BlocProvider<LayoutCubit>(
+                  create: (context) =>
+                      LayoutCubit(layoutRepo: layoutChangeRepo),
+                ),
+                BlocProvider<VideoPlayerCubit>(
+                  create: (context) =>
+                      VideoPlayerCubit(sqfliteStorageRepo: sqfliteStorageRepo),
+                ),
+              ],
+              child: BlocBuilder<ThemeCubit, ThemeData>(
+                builder: (context, currentTheme) => MaterialApp(
+                  theme: currentTheme,
+                  home: LayoutPage(),
+                ),
+              ),
+            );
+          }
+        });
   }
 }
