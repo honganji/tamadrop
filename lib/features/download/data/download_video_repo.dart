@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tamadrop/features/download/domain/entities/video.dart';
@@ -68,16 +67,12 @@ class DownloadVideoRepo implements VideoRepo {
 
     await for (var data in audioStream) {
       downloadedData += data.length;
-      print(
-          'Audio Download Progress: ${(downloadedData / totalData * 100).toStringAsFixed(2)}%');
       progressCubit.updateProgress(downloadedData / totalData * 100);
       audioFileStream.add(data);
     }
 
     await for (var data in videoStream) {
       downloadedData += data.length;
-      print(
-          'Video Download Progress: ${(downloadedData / totalData * 100).toStringAsFixed(2)}%');
       progressCubit.updateProgress(downloadedData / totalData * 100);
       videoFileStream.add(data);
     }
@@ -154,8 +149,8 @@ class DownloadVideoRepo implements VideoRepo {
       lastPlayedAt: DateTime.now(),
       thumbnailFilePath: thumbnailPath,
       title: video.title,
-      volume: 1,
-      length: video.duration?.inMinutes ?? 0,
+      volume: ((await File(videoPath).length()) / 1024 / 1024).toInt(),
+      length: video.duration?.inSeconds ?? 0,
     );
     return localVideo;
   }

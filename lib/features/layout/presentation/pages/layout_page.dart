@@ -54,11 +54,6 @@ class LayoutPage extends StatelessWidget {
                       child: !layoutCubit.isDownloadPage
                           ? Container(
                               key: ValueKey<bool>(layoutCubit.isDownloadPage),
-                              // child: VideoPlayerPage(
-                              //   videoPath: videoCubit.localVideo != null
-                              //       ? videoCubit.localVideo!.path
-                              //       : "assets/Frieren_video.mp4",
-                              // ),
                               child: const PlaylistPage(),
                             )
                           : null,
