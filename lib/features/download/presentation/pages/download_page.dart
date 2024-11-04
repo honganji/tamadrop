@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/download/presentation/components/my_text_field.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
+import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
 
 class DownloadPage extends StatelessWidget {
   DownloadPage({super.key});
@@ -17,7 +18,7 @@ class DownloadPage extends StatelessWidget {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("The url is empty...")));
       } else {
-        print(url);
+        print("Downloading started");
         videoCubit.downloadVideo(url);
       }
     }
@@ -25,11 +26,32 @@ class DownloadPage extends StatelessWidget {
     return BlocConsumer<VideoCubit, VideoState>(
       builder: (context, state) {
         if (state is VideoLoading) {
-          return const Center(
-            child: SizedBox(
-              height: 50,
-              width: 50,
-              child: CircularProgressIndicator(),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: CircularProgressIndicator(),
+                ),
+                BlocBuilder<ProgressCubit, double>(
+                  builder: (context, progress) {
+                    return Column(
+                      children: [
+                        const Text(
+                          "Progress: ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text((progress).toStringAsFixed(1))
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
           );
         } else {

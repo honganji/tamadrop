@@ -1,15 +1,20 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tamadrop/features/download/domain/entities/video.dart';
 import 'package:tamadrop/features/download/domain/repos/video_repo.dart';
+import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 
 class DownloadVideoRepo implements VideoRepo {
+  final ProgressCubit progressCubit;
+  DownloadVideoRepo(this.progressCubit);
   Future<String> _runFFmpeg(String command) async {
     var session = await FFmpegKit.execute(command);
     var returnCode = await session.getReturnCode();
@@ -56,8 +61,27 @@ class DownloadVideoRepo implements VideoRepo {
     // Write video and audio info into a file
     var audioFileStream = audioFile.openWrite();
     var videoFileStream = videoFile.openWrite();
-    await audioStream.pipe(audioFileStream);
-    await videoStream.pipe(videoFileStream);
+
+    var totalData = streamAudioInfo.size.totalBytes.toInt() +
+        streamVideoInfo.size.totalBytes.toInt();
+    var downloadedData = 0;
+
+    await for (var data in audioStream) {
+      downloadedData += data.length;
+      print(
+          'Audio Download Progress: ${(downloadedData / totalData * 100).toStringAsFixed(2)}%');
+      progressCubit.updateProgress(downloadedData / totalData * 100);
+      audioFileStream.add(data);
+    }
+
+    await for (var data in videoStream) {
+      downloadedData += data.length;
+      print(
+          'Video Download Progress: ${(downloadedData / totalData * 100).toStringAsFixed(2)}%');
+      progressCubit.updateProgress(downloadedData / totalData * 100);
+      videoFileStream.add(data);
+    }
+    progressCubit.updateProgress(0);
 
     // Close the files
     await audioFileStream.flush();
