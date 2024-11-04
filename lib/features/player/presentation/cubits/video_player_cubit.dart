@@ -11,7 +11,6 @@ class VideoPlayerCubit extends Cubit<VideoPlayerState> {
     try {
       emit(VideoPlayerLoading());
       final localVideos = await sqfliteStorageRepo.getAllVideos();
-      print(localVideos[0].path);
       emit(VideoPlayerLoaded(localVideos));
     } catch (e) {
       emit(VideoPlayerError(e.toString()));

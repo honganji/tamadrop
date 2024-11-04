@@ -29,4 +29,14 @@ class VideoCubit extends Cubit<VideoState> {
       emit(VideoError(e.toString()));
     }
   }
+
+  Future<void> deleteVideo(LocalVideo video) async {
+    try {
+      emit(VideoDeleting(video.vid));
+      await storageRepo.deleteVideo(video);
+      emit(VideoDeleted());
+    } catch (e) {
+      emit(VideoError(e.toString()));
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -87,12 +87,14 @@ class SqfliteStorageRepo implements StorageRepo {
   }
 
   @override
-  Future<void> deleteVideo(String videoId) async {
+  Future<void> deleteVideo(LocalVideo video) async {
     if (db != null) {
+      await File(video.path).delete();
+      await File(video.thumbnailFilePath).delete();
       await db!.delete(
         "videos",
         where: "vid = ?",
-        whereArgs: [videoId],
+        whereArgs: [video.vid],
       );
     } else {
       throw Exception("Failed to delete data");

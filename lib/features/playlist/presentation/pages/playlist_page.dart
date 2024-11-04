@@ -13,60 +13,65 @@ class PlaylistPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final videoPlayerCubit = context.read<VideoPlayerCubit>();
     videoPlayerCubit.getAllVideos();
-    return Column(
-      children: [
-        BlocListener<VideoCubit, void>(
-          listener: (context, state) => videoPlayerCubit.getAllVideos(),
-          child: BlocConsumer<VideoPlayerCubit, VideoPlayerState>(
-            builder: (context, state) {
-              if (state is VideoPlayerLoaded) {
-                final videos = state.localVideos;
-                return SizedBox(
-                  height: 200,
-                  child: ListView.builder(
-                    itemCount: videos.length,
-                    itemBuilder: (context, index) {
-                      final video = videos[index];
-                      return VideoBox(video);
-                    },
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-            listener: (context, state) {
-              if (state is VideoPlayerError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      state.toString(),
+    return SafeArea(
+      child: Column(
+        children: [
+          BlocListener<VideoCubit, void>(
+            listener: (context, state) => videoPlayerCubit.getAllVideos(),
+            child: BlocConsumer<VideoPlayerCubit, VideoPlayerState>(
+              builder: (context, state) {
+                if (state is VideoPlayerLoaded) {
+                  final videos = state.localVideos;
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: videos.length,
+                      itemBuilder: (context, index) {
+                        final video = videos[index];
+                        print(video.path);
+                        return VideoBox(video);
+                      },
                     ),
-                  ),
-                );
-              }
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+              listener: (context, state) {
+                if (state is VideoPlayerError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        state.toString(),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          BlocBuilder<ProgressCubit, double>(
+            builder: (context, progress) {
+              return Container(
+                margin: const EdgeInsets.all(32),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Progress: ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text((progress).toStringAsFixed(1))
+                  ],
+                ),
+              );
             },
           ),
-        ),
-        BlocBuilder<ProgressCubit, double>(
-          builder: (context, progress) {
-            return Column(
-              children: [
-                const Text(
-                  "Progress: ",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text((progress).toStringAsFixed(1))
-              ],
-            );
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

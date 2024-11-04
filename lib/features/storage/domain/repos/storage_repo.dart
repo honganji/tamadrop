@@ -14,5 +14,5 @@ abstract class StorageRepo {
   Future<void> updateVideo(LocalVideo newVideo, String videoId);
 
   // Delete
-  Future<void> deleteVideo(String videoId);
+  Future<void> deleteVideo(LocalVideo video);
 }
