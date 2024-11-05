@@ -18,7 +18,6 @@ class DownloadPage extends StatelessWidget {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("The url is empty...")));
       } else {
-        print("Downloading started");
         videoCubit.downloadVideo(url);
       }
     }

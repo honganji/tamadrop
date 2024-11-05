@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tamadrop/features/download/domain/entities/video.dart';
 import 'package:tamadrop/features/storage/domain/repos/storage_repo.dart';
+import 'package:path/path.dart' as path;
 
 class SqfliteStorageRepo implements StorageRepo {
   Database? db;
@@ -41,8 +43,6 @@ class SqfliteStorageRepo implements StorageRepo {
   Future<void> storeVideo(LocalVideo video) async {
     if (db != null) {
       await db!.insert('videos', video.toJson());
-      // TODO remove
-      print("Stored data properly");
     } else {
       throw Exception("Database is not initialized properly...");
     }
@@ -63,9 +63,21 @@ class SqfliteStorageRepo implements StorageRepo {
   @override
   Future<List<LocalVideo>> getAllVideos() async {
     if (db != null) {
+      var appDocDir = await getApplicationDocumentsDirectory();
       List<Map<String, dynamic>> dataList = await db!.query("videos");
-      List<LocalVideo> localVideoList = List<LocalVideo>.from(
-          dataList.map((video) => LocalVideo.fromJson(video)));
+      // print("${dataList[0]}");
+      List<LocalVideo> localVideoList = dataList.map<LocalVideo>((video) {
+        try {
+          LocalVideo tmp;
+          tmp = LocalVideo.fromJson(video);
+          tmp.path = path.join(appDocDir.path, video["path"]);
+          tmp.thumbnailFilePath =
+              path.join(appDocDir.path, video["thumbnail_file_path"]);
+          return tmp;
+        } catch (e) {
+          throw Exception('Error processing video: $e');
+        }
+      }).toList();
       return localVideoList;
     } else {
       throw Exception("Failed to get data...");

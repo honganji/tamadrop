@@ -27,7 +27,6 @@ class PlaylistPage extends StatelessWidget {
                       itemCount: videos.length,
                       itemBuilder: (context, index) {
                         final video = videos[index];
-                        print(video.path);
                         return VideoBox(video);
                       },
                     ),

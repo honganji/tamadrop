@@ -45,7 +45,9 @@ class DownloadVideoRepo implements VideoRepo {
     var videoStream = yt.videos.streams.get(streamVideoInfo);
 
     // Define the file paths
-    final videoDir = Directory('$appDocDir/videos');
+    const videoDirName = "videos";
+    final relativeVideoPath = "$videoDirName/$time.mp4";
+    final videoDir = Directory('$appDocDir/$videoDirName');
     if (!await videoDir.exists()) {
       await videoDir.create(recursive: true);
     }
@@ -53,7 +55,7 @@ class DownloadVideoRepo implements VideoRepo {
         appDocDir, '${video.id}_audio.${streamAudioInfo.container.name}');
     var videoFilePath = path.join(
         appDocDir, '${video.id}_video.${streamVideoInfo.container.name}');
-    var outputFilePath = path.join(videoDir.path, '$time.mp4');
+    var outputFilePath = path.join(appDocDir, relativeVideoPath);
     var audioFile = File(audioFilePath);
     var videoFile = File(videoFilePath);
 
@@ -91,22 +93,18 @@ class DownloadVideoRepo implements VideoRepo {
     try {
       mergeResult = await _runFFmpeg(mergeCommand);
     } catch (e) {
-      print(e.toString());
+      Exception(e.toString());
     }
 
-    if (mergeResult == 'success') {
-      print('Download and merge successful: $outputFilePath');
-      print('Video saved: $outputFilePath');
-      print('Video title: ${video.title}');
-    } else {
-      print('Error during merging: $mergeResult');
+    if (mergeResult != 'success') {
+      Exception('Error during merging: $mergeResult');
     }
 
     // Clean up temporary files
     await audioFile.delete();
     await videoFile.delete();
 
-    return outputFilePath;
+    return relativeVideoPath;
   }
 
   Future<String> _downloadThumbnail(
@@ -115,18 +113,20 @@ class DownloadVideoRepo implements VideoRepo {
     Video video,
     String time,
   ) async {
-    final thumbnailDir = Directory('${appDocDir}/thumbnails');
+    const thumbnailDirName = "thambnails";
+    final relativeThumbnailPath = "$thumbnailDirName/${time}.jpg";
+    final thumbnailDir = Directory('$appDocDir/$thumbnailDirName');
     if (!await thumbnailDir.exists()) {
       await thumbnailDir.create(recursive: true);
     }
-    final thumbnailFilePath = '${thumbnailDir.path}/${time}.jpg';
+    final thumbnailFilePath = path.join(appDocDir, relativeThumbnailPath);
     // Fetch the image from the URL
     final response = await http.get(Uri.parse(video.thumbnails.highResUrl));
 
     // Save the image to the local storage
     final thumbnailFile = File(thumbnailFilePath);
     await thumbnailFile.writeAsBytes(response.bodyBytes);
-    return thumbnailFilePath;
+    return relativeThumbnailPath;
   }
 
   @override
@@ -141,7 +141,6 @@ class DownloadVideoRepo implements VideoRepo {
         await _downloadThumbnail(url, appDocDir.path, video, time);
 
     yt.close();
-    // TODO Get the size of the video file
     localVideo = LocalVideo(
       vid: time,
       path: videoPath,
@@ -149,7 +148,10 @@ class DownloadVideoRepo implements VideoRepo {
       lastPlayedAt: DateTime.now(),
       thumbnailFilePath: thumbnailPath,
       title: video.title,
-      volume: ((await File(videoPath).length()) / 1024 / 1024).toInt(),
+      volume: ((await File(path.join(appDocDir.path, videoPath)).length()) /
+              1024 /
+              1024)
+          .toInt(),
       length: video.duration?.inSeconds ?? 0,
     );
     return localVideo;
