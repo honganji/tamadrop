@@ -7,11 +7,11 @@ import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/pages/layout_page.dart';
 import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
+import 'package:tamadrop/features/playlist/presentation/cubits/playlist_cubit.dart';
 import 'package:tamadrop/features/storage/data/sqflite_storage_repo.dart';
 import 'package:tamadrop/features/themes/theme_cubit.dart';
 
 class MainApp extends StatelessWidget {
-  // final downloadVideoRepo = DownloadVideoRepo();
   final layoutChangeRepo = LayoutChangeRepo();
   final sqfliteStorageRepo = SqfliteStorageRepo();
   MainApp({super.key});
@@ -64,6 +64,9 @@ class MainApp extends StatelessWidget {
                 BlocProvider<VideoPlayerCubit>(
                   create: (context) =>
                       VideoPlayerCubit(sqfliteStorageRepo: sqfliteStorageRepo),
+                ),
+                BlocProvider<PlaylistCubit>(
+                  create: (context) => PlaylistCubit(sqfliteStorageRepo),
                 ),
               ],
               child: BlocBuilder<ThemeCubit, ThemeData>(

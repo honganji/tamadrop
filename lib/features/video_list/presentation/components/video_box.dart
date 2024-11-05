@@ -25,7 +25,7 @@ class VideoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DateFormat formatter = DateFormat('d/M/yyyy HH:mm:ss');
-    final String formattedDate = formatter.format(localVideo.lastPlayedAt);
+    final String formattedDate = formatter.format(localVideo.createdAt);
     final videoCubit = context.read<VideoCubit>();
     return BlocBuilder<VideoCubit, VideoState>(builder: (context, state) {
       if (state is VideoDeleting && state.vid == localVideo.vid) {

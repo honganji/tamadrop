@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:tamadrop/features/download/presentation/components/my_text_field.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
+import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
 
 class DownloadPage extends StatelessWidget {
-  DownloadPage({super.key});
+  const DownloadPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final videoCubit = context.read<VideoCubit>();
     final textController = TextEditingController();
+    final layoutCubit = context.read<LayoutCubit>();
     void downloadVideo() {
       final String url = textController.text;
       if (url.isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("The url is empty...")));
+        layoutCubit.emitError("The url is empty...");
       } else {
-        videoCubit.downloadVideo(url);
+        // TODO enable to choose which playlist to add to
+        videoCubit.downloadVideo(url, 1);
       }
     }
 
@@ -86,6 +89,7 @@ class DownloadPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
+              duration: Duration(seconds: 2),
             ),
           );
         }

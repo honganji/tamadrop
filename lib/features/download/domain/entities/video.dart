@@ -3,8 +3,7 @@ import 'dart:convert';
 class LocalVideo {
   String vid;
   String path;
-  List<String> playlistIDs;
-  DateTime lastPlayedAt;
+  DateTime createdAt;
   String thumbnailFilePath;
   String title;
   int volume;
@@ -13,8 +12,7 @@ class LocalVideo {
   LocalVideo({
     required this.vid,
     required this.path,
-    required this.playlistIDs,
-    required this.lastPlayedAt,
+    required this.createdAt,
     required this.thumbnailFilePath,
     required this.title,
     required this.volume,
@@ -25,8 +23,7 @@ class LocalVideo {
     return {
       "vid": vid,
       "path": path,
-      "playlist_ids": jsonEncode(playlistIDs),
-      "last_play_at": lastPlayedAt.toIso8601String(),
+      "created_at": createdAt.toIso8601String(),
       "thumbnail_file_path": thumbnailFilePath,
       "title": title,
       "volume": volume,
@@ -38,8 +35,7 @@ class LocalVideo {
     return LocalVideo(
       vid: json["vid"],
       path: json["path"],
-      playlistIDs: List<String>.from(jsonDecode(json["playlist_ids"])),
-      lastPlayedAt: DateTime.parse(json["last_play_at"]),
+      createdAt: DateTime.parse(json["created_at"]),
       thumbnailFilePath: json["thumbnail_file_path"],
       title: json["title"],
       volume: json["volume"],

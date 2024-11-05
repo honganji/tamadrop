@@ -16,4 +16,14 @@ class VideoPlayerCubit extends Cubit<VideoPlayerState> {
       emit(VideoPlayerError(e.toString()));
     }
   }
+
+  Future<void> getCategorizedVideo(int pid) async {
+    try {
+      emit(VideoPlayerLoading());
+      final localVideos = await sqfliteStorageRepo.getCategorizedVideo(pid);
+      emit(VideoPlayerLoaded(localVideos));
+    } catch (e) {
+      emit(VideoPlayerError(e.toString()));
+    }
+  }
 }

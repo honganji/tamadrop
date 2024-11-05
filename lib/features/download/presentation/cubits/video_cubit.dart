@@ -15,12 +15,12 @@ class VideoCubit extends Cubit<VideoState> {
 
   LocalVideo? get localVideo => _localVideo;
 
-  Future<void> downloadVideo(String url) async {
+  Future<void> downloadVideo(String url, int pid) async {
     try {
       emit(VideoLoading());
       _localVideo = await downloadVideoRepo.downloadVideo(url);
       if (_localVideo != null) {
-        storageRepo.storeVideo(_localVideo!);
+        storageRepo.storeVideo(_localVideo!, pid);
       } else {
         emit(VideoError("couldn't store video properly"));
       }

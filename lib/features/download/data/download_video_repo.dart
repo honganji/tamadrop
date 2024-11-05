@@ -144,8 +144,7 @@ class DownloadVideoRepo implements VideoRepo {
     localVideo = LocalVideo(
       vid: time,
       path: videoPath,
-      playlistIDs: [],
-      lastPlayedAt: DateTime.now(),
+      createdAt: DateTime.now(),
       thumbnailFilePath: thumbnailPath,
       title: video.title,
       volume: ((await File(path.join(appDocDir.path, videoPath)).length()) /

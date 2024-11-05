@@ -27,22 +27,42 @@ class SqfliteStorageRepo implements StorageRepo {
         CREATE TABLE videos (
           vid TEXT PRIMARY KEY,
           path TEXT,
-          playlist_ids TEXT,
-          last_play_at TEXT,
+          created_at TEXT,
           thumbnail_file_path TEXT,
           title TEXT,
           volume INTEGER,
           length INTEGER
         )
       ''');
+
+        await db.execute('''
+      CREATE TABLE playlists (
+        pid INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT
+      )
+    ''');
+
+        await db.execute('''
+      CREATE TABLE playlist_videos (
+        pid INTEGER,
+        vid TEXT,
+        FOREIGN KEY (pid) REFERENCES playlists (pid),
+        FOREIGN KEY (vid) REFERENCES videos (vid),
+        PRIMARY KEY (pid, vid)
+      )
+    ''');
+        // Insert initial values into the playlists table
+        await db.insert('playlists', {'name': 'pop'});
+        await db.insert('playlists', {'name': 'love'});
       },
     );
   }
 
   @override
-  Future<void> storeVideo(LocalVideo video) async {
+  Future<void> storeVideo(LocalVideo video, int pid) async {
     if (db != null) {
       await db!.insert('videos', video.toJson());
+      await db!.insert('playlist_videos', {'pid': pid, 'vid': video.vid});
     } else {
       throw Exception("Database is not initialized properly...");
     }
@@ -52,9 +72,29 @@ class SqfliteStorageRepo implements StorageRepo {
   @override
   Future<List<LocalVideo>> getCategorizedVideo(int categoryId) async {
     if (db != null) {
-      List<Map<String, dynamic>> dataList = await db!.query("videos");
-      return List<LocalVideo>.from(
-          dataList.map((video) => LocalVideo.fromJson(video)));
+      var appDocDir = await getApplicationDocumentsDirectory();
+      List<Map<String, dynamic>> dataList = await db!.rawQuery('''
+        SELECT videos.*
+        FROM videos
+        INNER JOIN playlist_videos ON videos.vid = playlist_videos.vid
+        WHERE playlist_videos.pid = ?
+      ''', [categoryId]);
+
+      List<LocalVideo> localVideoList = dataList.map<LocalVideo>((video) {
+        try {
+          LocalVideo tmp;
+          tmp = LocalVideo.fromJson(video);
+          tmp.path = path.join(appDocDir.path, video["path"]);
+          tmp.thumbnailFilePath =
+              path.join(appDocDir.path, video["thumbnail_file_path"]);
+          return tmp;
+        } catch (e) {
+          print('Error processing video: $e');
+          throw Exception('Error processing video: $e');
+        }
+      }).toList();
+      print(localVideoList);
+      return localVideoList;
     } else {
       throw Exception("Failed to get data...");
     }
@@ -78,6 +118,16 @@ class SqfliteStorageRepo implements StorageRepo {
         }
       }).toList();
       return localVideoList;
+    } else {
+      throw Exception("Failed to get data...");
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllPlaylists() async {
+    if (db != null) {
+      List<Map<String, dynamic>> dataList = await db!.query('playlists');
+      print(dataList);
+      return dataList;
     } else {
       throw Exception("Failed to get data...");
     }

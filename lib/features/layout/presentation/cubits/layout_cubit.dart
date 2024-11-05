@@ -1,15 +1,22 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tamadrop/features/layout/domain/entities/layout.dart';
 import 'package:tamadrop/features/layout/domain/repos/layout_repo.dart';
+import 'package:tamadrop/features/layout/presentation/cubits/layout_states.dart';
+import 'package:tamadrop/features/playlist/presentation/pages/playlist_page.dart';
 
-class LayoutCubit extends Cubit<bool> {
+class LayoutCubit extends Cubit<LayoutState> {
   final LayoutRepo layoutRepo;
-  Layout layout = Layout(isDownloadPage: false);
-  LayoutCubit({required this.layoutRepo}) : super(true);
-  bool get isDownloadPage => layout.isDownloadPage;
-  void switchPage(bool isDownloadPage) {
-    emit(!isDownloadPage);
-    layout.isDownloadPage = layoutRepo.switchPage(isDownloadPage);
-    emit(!isDownloadPage);
+  Widget _page = const PlaylistPage();
+  LayoutCubit({required this.layoutRepo}) : super(LayoutLoaded());
+
+  Widget get page => _page;
+
+  void switchPage(Widget page) {
+    _page = page;
+    emit(LayoutLoaded());
+  }
+
+  void emitError(String message) {
+    emit(LayoutError(message));
   }
 }
