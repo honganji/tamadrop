@@ -65,7 +65,6 @@ class SqfliteStorageRepo implements StorageRepo {
     if (db != null) {
       var appDocDir = await getApplicationDocumentsDirectory();
       List<Map<String, dynamic>> dataList = await db!.query("videos");
-      // print("${dataList[0]}");
       List<LocalVideo> localVideoList = dataList.map<LocalVideo>((video) {
         try {
           LocalVideo tmp;

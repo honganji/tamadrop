@@ -120,7 +120,35 @@ class VideoBox extends StatelessWidget {
             const Spacer(),
             GestureDetector(
               onTap: () {
-                videoCubit.deleteVideo(localVideo);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Do you wanna delete this video?'),
+                      // content: Text('This is a simple alert dialog.'),
+                      actions: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                              child: Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                videoCubit.deleteVideo(localVideo);
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                              child: Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
               child: Icon(
                 Icons.edit_note_sharp,

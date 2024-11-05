@@ -63,7 +63,7 @@ class PlaylistPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text((progress).toStringAsFixed(1))
+                    Text("${(progress).toStringAsFixed(1)} %")
                   ],
                 ),
               );
