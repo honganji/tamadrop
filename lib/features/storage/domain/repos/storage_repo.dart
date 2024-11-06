@@ -20,4 +20,13 @@ abstract class StorageRepo {
   /* Playlists */
   // Get All
   Future<List<Map<String, dynamic>>> getAllPlaylists();
+
+  // Create
+  Future<void> addPlaylist(String name);
+
+  // Update
+  Future<void> updatePlaylist(int pid, String newName);
+
+  // Delete
+  Future<void> deletePlaylist(int pid);
 }

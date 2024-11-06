@@ -10,6 +10,7 @@ import 'package:path/path.dart' as path;
 
 class SqfliteStorageRepo implements StorageRepo {
   Database? db;
+  int? _allPid;
   @override
   Future<void> initializeDB() async {
     // Get the database path
@@ -52,23 +53,42 @@ class SqfliteStorageRepo implements StorageRepo {
       )
     ''');
         // Insert initial values into the playlists table
+        await db.insert('playlists', {'name': 'all'});
         await db.insert('playlists', {'name': 'pop'});
         await db.insert('playlists', {'name': 'love'});
       },
     );
+    _getAllPlaylistIdByName("all");
+  }
+
+  Future<void> _getAllPlaylistIdByName(String name) async {
+    if (db != null) {
+      List<Map<String, dynamic>> result = await db!.query(
+        'playlists',
+        columns: ['pid'],
+        where: 'name = ?',
+        whereArgs: [name],
+      );
+      if (result.isNotEmpty) {
+        _allPid = result.first['pid'] as int?;
+      }
+    } else {
+      throw Exception("Database is not initialized properly...");
+    }
   }
 
   @override
   Future<void> storeVideo(LocalVideo video, int pid) async {
     if (db != null) {
       await db!.insert('videos', video.toJson());
+      // this is to add to all
+      await db!.insert('playlist_videos', {'pid': pid, 'vid': _allPid});
       await db!.insert('playlist_videos', {'pid': pid, 'vid': video.vid});
     } else {
       throw Exception("Database is not initialized properly...");
     }
   }
 
-  // TODO modify to get the videos which related to specific playlist
   @override
   Future<List<LocalVideo>> getCategorizedVideo(int categoryId) async {
     if (db != null) {
@@ -93,7 +113,6 @@ class SqfliteStorageRepo implements StorageRepo {
           throw Exception('Error processing video: $e');
         }
       }).toList();
-      print(localVideoList);
       return localVideoList;
     } else {
       throw Exception("Failed to get data...");
@@ -123,13 +142,49 @@ class SqfliteStorageRepo implements StorageRepo {
     }
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getAllPlaylists() async {
     if (db != null) {
       List<Map<String, dynamic>> dataList = await db!.query('playlists');
-      print(dataList);
       return dataList;
     } else {
       throw Exception("Failed to get data...");
+    }
+  }
+
+  @override
+  Future<void> addPlaylist(String name) async {
+    if (db != null) {
+      await db!.insert('playlists', {'name': name});
+    } else {
+      throw Exception("Failed to add playlist");
+    }
+  }
+
+  @override
+  Future<void> updatePlaylist(int pid, String newName) async {
+    if (db != null) {
+      await db!.update(
+        'playlists',
+        {'name': newName},
+        where: 'pid = ?',
+        whereArgs: [pid],
+      );
+    } else {
+      throw Exception("Failed to update playlist");
+    }
+  }
+
+  @override
+  Future<void> deletePlaylist(int pid) async {
+    if (db != null) {
+      await db!.delete(
+        'playlists',
+        where: 'pid = ?',
+        whereArgs: [pid],
+      );
+    } else {
+      throw Exception("Failed to delete playlist");
     }
   }
 

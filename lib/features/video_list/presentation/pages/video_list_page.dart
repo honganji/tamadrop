@@ -27,7 +27,6 @@ class VideoListPage extends StatelessWidget {
         },
         child: Column(
           children: [
-            Text(playlist.name),
             BlocListener<VideoCubit, void>(
               listener: (context, state) => videoPlayerCubit.getAllVideos(),
               child: BlocConsumer<VideoPlayerCubit, VideoPlayerState>(

@@ -42,36 +42,38 @@ class LayoutPage extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: BlocBuilder<LayoutCubit, LayoutState>(
-                    builder: (context, state) {
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          if (child is VideoListPage) {
-                            return ScaleTransition(
-                              scale: animation,
-                              child: child,
-                            );
-                          } else {
-                            return FadeTransition(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: BlocBuilder<LayoutCubit, LayoutState>(
+                  builder: (context, state) {
+                    // TODO make it better transition
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        if (child is VideoListPage) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        } else {
+                          return Align(
+                            alignment: Alignment.topCenter,
+                            child: FadeTransition(
                               opacity: animation,
                               child: child,
-                            );
-                          }
-                        },
-                        child: layoutCubit.page,
-                      );
-                    },
-                  ),
+                            ),
+                          );
+                        }
+                      },
+                      child: layoutCubit.page,
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           Positioned(
             bottom: 24.0,
