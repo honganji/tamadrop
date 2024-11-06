@@ -22,7 +22,7 @@ class VideoListPage extends StatelessWidget {
       child: GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity! < 0) {
-            layoutCubit.switchPage(const PlaylistPage());
+            layoutCubit.switchPage(const PlaylistPage(), null);
           }
         },
         child: Column(

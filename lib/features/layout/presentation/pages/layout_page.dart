@@ -16,11 +16,14 @@ class LayoutPage extends StatelessWidget {
     final layoutCubit = context.read<LayoutCubit>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tama Drop'),
+        title: BlocBuilder<LayoutCubit, LayoutState>(builder: (context, state) {
+          return Text(layoutCubit.title);
+        }),
         leading: BlocBuilder<LayoutCubit, LayoutState>(
           builder: (context, state) => layoutCubit.page is VideoListPage
               ? IconButton(
-                  onPressed: () => layoutCubit.switchPage(const PlaylistPage()),
+                  onPressed: () =>
+                      layoutCubit.switchPage(const PlaylistPage(), null),
                   icon: const Icon(Icons.arrow_back_ios),
                 )
               : const SizedBox(),
@@ -50,10 +53,17 @@ class LayoutPage extends StatelessWidget {
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder:
                             (Widget child, Animation<double> animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
+                          if (child is VideoListPage) {
+                            return ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            );
+                          } else {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          }
                         },
                         child: layoutCubit.page,
                       );

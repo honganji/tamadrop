@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
+import 'package:tamadrop/features/playlist/domain/entities/playlist.dart';
 import 'package:tamadrop/features/video_list/presentation/pages/video_list_page.dart';
 
 class PlaylistBox extends StatelessWidget {
-  final playlist;
+  final Playlist playlist;
   const PlaylistBox({required this.playlist, super.key});
 
   @override
@@ -15,7 +16,8 @@ class PlaylistBox extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.9,
       child: GestureDetector(
         onTap: () {
-          layoutCubit.switchPage(VideoListPage(playlist: playlist));
+          layoutCubit.switchPage(
+              VideoListPage(playlist: playlist), playlist.name);
         },
         child: Container(
           decoration: BoxDecoration(
