@@ -32,7 +32,7 @@ class PlaylistBox extends StatelessWidget {
             children: [
               Text(
                 playlist.name,
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               )
             ],
           ),

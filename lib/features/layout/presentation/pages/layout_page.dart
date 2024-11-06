@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/download/presentation/pages/download_page.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_states.dart';
+import 'package:tamadrop/features/playlist/presentation/pages/playlist_page.dart';
 import 'package:tamadrop/features/themes/theme_cubit.dart';
+import 'package:tamadrop/features/video_list/presentation/pages/video_list_page.dart';
 
 class LayoutPage extends StatelessWidget {
   const LayoutPage({super.key});
@@ -15,6 +17,14 @@ class LayoutPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tama Drop'),
+        leading: BlocBuilder<LayoutCubit, LayoutState>(
+          builder: (context, state) => layoutCubit.page is VideoListPage
+              ? IconButton(
+                  onPressed: () => layoutCubit.switchPage(const PlaylistPage()),
+                  icon: const Icon(Icons.arrow_back_ios),
+                )
+              : const SizedBox(),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -36,7 +46,17 @@ class LayoutPage extends StatelessWidget {
                 Expanded(
                   child: BlocBuilder<LayoutCubit, LayoutState>(
                     builder: (context, state) {
-                      return layoutCubit.page;
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                        child: layoutCubit.page,
+                      );
                     },
                   ),
                 ),
