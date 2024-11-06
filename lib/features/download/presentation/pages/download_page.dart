@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
 import 'package:tamadrop/features/download/presentation/components/my_text_field.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
@@ -74,11 +73,12 @@ class DownloadPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                    onPressed: () {
-                      downloadVideo();
-                      textController.clear();
-                    },
-                    child: Text("download")),
+                  onPressed: () {
+                    downloadVideo();
+                    textController.clear();
+                  },
+                  child: const Text("download"),
+                ),
               ],
             ),
           );
@@ -89,7 +89,7 @@ class DownloadPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         }

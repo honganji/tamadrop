@@ -18,7 +18,6 @@ class VideoListPage extends StatelessWidget {
     final videoPlayerCubit = context.read<VideoPlayerCubit>();
     final layoutCubit = context.read<LayoutCubit>();
     videoPlayerCubit.getCategorizedVideo(playlist.pid);
-    print(playlist.pid);
     return SafeArea(
       child: GestureDetector(
         onHorizontalDragEnd: (details) {

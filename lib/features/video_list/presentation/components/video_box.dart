@@ -17,7 +17,7 @@ class VideoBox extends StatelessWidget {
 
     final String hoursStr = '${hours.toString().padLeft(2, '0')}:';
     final String minutesStr = '${minutes.toString().padLeft(2, '0')}:';
-    final String secondsStr = '${remainingSeconds.toString().padLeft(2, '0')}';
+    final String secondsStr = remainingSeconds.toString().padLeft(2, '0');
 
     return '$hoursStr$minutesStr$secondsStr';
   }
@@ -38,7 +38,7 @@ class VideoBox extends StatelessWidget {
             Radius.circular(2),
           ),
         ),
-        margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
         padding: const EdgeInsets.symmetric(horizontal: 4),
         width: double.infinity,
         height: 72,
@@ -124,8 +124,7 @@ class VideoBox extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Do you wanna delete this video?'),
-                      // content: Text('This is a simple alert dialog.'),
+                      title: const Text('Do you wanna delete this video?'),
                       actions: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -141,7 +140,7 @@ class VideoBox extends StatelessWidget {
                                 videoCubit.deleteVideo(localVideo);
                                 Navigator.of(context).pop(); // Close the dialog
                               },
-                              child: Text('Delete'),
+                              child: const Text('Delete'),
                             ),
                           ],
                         ),

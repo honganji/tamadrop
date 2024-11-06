@@ -43,7 +43,7 @@ class _VideoPlayerState extends State<VideoPlayerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Video Player"),
+        title: const Text("Video Player"),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

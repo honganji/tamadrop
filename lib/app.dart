@@ -72,7 +72,7 @@ class MainApp extends StatelessWidget {
               child: BlocBuilder<ThemeCubit, ThemeData>(
                 builder: (context, currentTheme) => MaterialApp(
                   theme: currentTheme,
-                  home: LayoutPage(),
+                  home: const LayoutPage(),
                 ),
               ),
             );

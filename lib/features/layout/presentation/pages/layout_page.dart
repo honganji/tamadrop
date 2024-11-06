@@ -8,8 +8,6 @@ import 'package:tamadrop/features/themes/theme_cubit.dart';
 
 class LayoutPage extends StatelessWidget {
   const LayoutPage({super.key});
-  // TEST
-  final bool isDownload = true;
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>();
@@ -37,36 +35,10 @@ class LayoutPage extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: BlocBuilder<LayoutCubit, LayoutState>(
-                      builder: (context, state) {
-                    return layoutCubit.page;
-                    // return Stack(
-                    //   children: [
-                    //     AnimatedSwitcher(
-                    //       duration: const Duration(milliseconds: 200),
-                    //       transitionBuilder:
-                    //           (Widget child, Animation<double> animation) {
-                    //         final offsetAnimation = Tween<Offset>(
-                    //           begin: const Offset(
-                    //               -1.0, 0.0), // Slide in from right
-                    //           end: Offset.zero,
-                    //         ).animate(animation);
-
-                    //         return SlideTransition(
-                    //           position: offsetAnimation,
-                    //           child: child,
-                    //         );
-                    //       },
-                    //       child: Container(
-                    //         key: const ValueKey<custom.Page>(
-                    //             custom.Page.playlistPage),
-                    //         child: layoutCubit.page is PlaylistPage
-                    //             ? const PlaylistPage()
-                    //             : null,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // );
-                  }),
+                    builder: (context, state) {
+                      return layoutCubit.page;
+                    },
+                  ),
                 ),
               ],
             ),
