@@ -4,11 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:tamadrop/features/download/domain/entities/video.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
+import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
 import 'package:tamadrop/features/player/presentation/pages/video_player_page.dart';
 
 class VideoBox extends StatelessWidget {
   final LocalVideo localVideo;
-  const VideoBox(this.localVideo, {super.key});
+  final int index;
+  const VideoBox(this.index, this.localVideo, {super.key});
 
   String formatDuration(int seconds) {
     final int hours = seconds ~/ 3600;
@@ -27,6 +29,7 @@ class VideoBox extends StatelessWidget {
     final DateFormat formatter = DateFormat('d/M/yyyy HH:mm:ss');
     final String formattedDate = formatter.format(localVideo.createdAt);
     final videoCubit = context.read<VideoCubit>();
+    final videoPlayerCubit = context.read<VideoPlayerCubit>();
     return BlocBuilder<VideoCubit, VideoState>(builder: (context, state) {
       if (state is VideoDeleting && state.vid == localVideo.vid) {
         return const Center(child: CircularProgressIndicator());
@@ -50,8 +53,10 @@ class VideoBox extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            VideoPlayerPage(videoPath: localVideo.path)));
+                        builder: (context) => VideoPlayerPage(
+                              videoPaths: videoPlayerCubit.videoList,
+                              index: index,
+                            )));
               },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,

@@ -100,6 +100,7 @@ class SqfliteStorageRepo implements StorageRepo {
         FROM videos
         INNER JOIN playlist_videos ON videos.vid = playlist_videos.vid
         WHERE playlist_videos.pid = ?
+        ORDER BY videos.created_at DESC
       ''', [categoryId]);
 
       List<LocalVideo> localVideoList = dataList.map<LocalVideo>((video) {

@@ -38,7 +38,7 @@ class VideoListPage extends StatelessWidget {
                         itemCount: videos.length,
                         itemBuilder: (context, index) {
                           final video = videos[index];
-                          return VideoBox(video);
+                          return VideoBox(index, video);
                         },
                       ),
                     );

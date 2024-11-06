@@ -1,13 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tamadrop/features/download/domain/entities/video.dart';
+import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerPage extends StatefulWidget {
-  final String videoPath;
+  final List<LocalVideo> videos;
+  final int index;
   const VideoPlayerPage({
     super.key,
-    required this.videoPath,
+    required this.videos,
+    required this.index,
   });
 
   @override
@@ -17,19 +22,25 @@ class VideoPlayerPage extends StatefulWidget {
 class _VideoPlayerState extends State<VideoPlayerPage> {
   late VideoPlayerController _controller;
 
+  List<String> videoPathList =
+      widget.videos.map((video) => video.path).toList();
   @override
   void initState() {
     super.initState();
-    if (widget.videoPath.startsWith("assets")) {
-      _controller = VideoPlayerController.asset(widget.videoPath)
+    final videoCubit = context.read<VideoPlayerCubit>();
+    List<String> videoPathList =
+        videoCubit.videoList.map((video) => video.path).toList();
+    if (videoPathList[widget.index].startsWith("assets")) {
+      _controller = VideoPlayerController.asset(widget.videoPaths[widget.index])
         ..initialize().then((_) {
           setState(() {});
         });
     } else {
-      _controller = VideoPlayerController.file(File(widget.videoPath))
-        ..initialize().then((_) {
-          setState(() {});
-        });
+      _controller =
+          VideoPlayerController.file(File(widget.videoPaths[widget.index]))
+            ..initialize().then((_) {
+              setState(() {});
+            });
     }
   }
 
