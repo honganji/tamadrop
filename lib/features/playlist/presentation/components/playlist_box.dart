@@ -11,18 +11,20 @@ class PlaylistBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layoutCubit = context.read<LayoutCubit>();
-    return SizedBox(
-      height: 60,
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: GestureDetector(
-        onTap: () {
-          layoutCubit.switchPage(
-              VideoListPage(playlist: playlist), playlist.name);
-        },
+    return GestureDetector(
+      onTap: () {
+        layoutCubit.switchPage(
+            VideoListPage(playlist: playlist), playlist.name);
+      },
+      child: SizedBox(
+        height: 60,
+        width: MediaQuery.of(context).size.width * 0.9,
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Colors.black, // Specify the border color
+              color: Theme.of(context)
+                  .colorScheme
+                  .inversePrimary, // Specify the border color
               width: 2, // Specify the border width
             ),
             borderRadius: BorderRadius.circular(10),
@@ -35,7 +37,19 @@ class PlaylistBox extends StatelessWidget {
               Text(
                 playlist.name,
                 style: const TextStyle(fontSize: 20),
-              )
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  // TODO play playlist
+                  print("play playlist");
+                },
+                child: Icon(
+                  Icons.play_circle,
+                  size: 32,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ),
             ],
           ),
         ),

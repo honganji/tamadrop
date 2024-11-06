@@ -5,14 +5,31 @@ import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart'
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
+import 'package:tamadrop/features/playlist/domain/entities/playlist.dart';
 
-class DownloadPage extends StatelessWidget {
-  const DownloadPage({super.key});
+class DownloadPage extends StatefulWidget {
+  final List<Playlist> playlists;
+  const DownloadPage({required this.playlists, super.key});
+
+  @override
+  State<DownloadPage> createState() => _DownloadPageState();
+}
+
+class _DownloadPageState extends State<DownloadPage> {
+  final textController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
+  int? selectedOption;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(focusNode);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final videoCubit = context.read<VideoCubit>();
-    final textController = TextEditingController();
     final layoutCubit = context.read<LayoutCubit>();
     void downloadVideo() {
       final String url = textController.text;
@@ -20,7 +37,7 @@ class DownloadPage extends StatelessWidget {
         layoutCubit.emitError("The url is empty...");
       } else {
         // TODO enable to choose which playlist to add to
-        videoCubit.downloadVideo(url, 1);
+        videoCubit.downloadVideo(url, selectedOption);
       }
     }
 
@@ -60,22 +77,41 @@ class DownloadPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Enter YouTube URL:',
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 20),
                 SizedBox(
                   width: 300,
                   child: MyTextField(
-                      controller: textController,
-                      hintText: "https://www.youtube.com/watch?v=..."),
+                    controller: textController,
+                    hintText: "https://www.youtube.com/watch?v=...",
+                    labelText: "Youtube URL",
+                    focusNode: focusNode,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                DropdownButton<int>(
+                  value: selectedOption,
+                  hint: const Text('playlist'),
+                  items: widget.playlists
+                      .where((playlist) => playlist.name != "all")
+                      .map((Playlist playlist) {
+                    return DropdownMenuItem<int>(
+                      value: playlist.pid,
+                      child: Text(playlist.name),
+                    );
+                  }).toList(),
+                  onChanged: (int? newValue) {
+                    setState(() {
+                      selectedOption = newValue;
+                    });
+                  },
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     downloadVideo();
                     textController.clear();
+                    setState(() {
+                      selectedOption = null;
+                    });
                   },
                   child: const Text("download"),
                 ),

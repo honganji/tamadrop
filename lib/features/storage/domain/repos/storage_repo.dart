@@ -5,7 +5,7 @@ abstract class StorageRepo {
   // initialization
   Future<void> initializeDB();
   // Create
-  Future<void> storeVideo(LocalVideo video, int pid);
+  Future<void> storeVideo(LocalVideo video, int? pid);
 
   // Read
   Future<List<LocalVideo>> getCategorizedVideo(int categoryId);

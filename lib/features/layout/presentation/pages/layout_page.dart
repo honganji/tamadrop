@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/download/presentation/pages/download_page.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_states.dart';
+import 'package:tamadrop/features/playlist/presentation/cubits/playlist_cubit.dart';
 import 'package:tamadrop/features/playlist/presentation/pages/playlist_page.dart';
 import 'package:tamadrop/features/themes/theme_cubit.dart';
 import 'package:tamadrop/features/video_list/presentation/pages/video_list_page.dart';
@@ -14,6 +15,7 @@ class LayoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>();
     final layoutCubit = context.read<LayoutCubit>();
+    final playlistCubit = context.read<PlaylistCubit>();
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<LayoutCubit, LayoutState>(builder: (context, state) {
@@ -48,14 +50,19 @@ class LayoutPage extends StatelessWidget {
               Expanded(
                 child: BlocBuilder<LayoutCubit, LayoutState>(
                   builder: (context, state) {
-                    // TODO make it better transition
                     return AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
                         if (child is VideoListPage) {
-                          return ScaleTransition(
-                            scale: animation,
+                          final offsetAnimation = Tween<Offset>(
+                            begin:
+                                const Offset(1.0, 0.0), // Slide in from right
+                            end: Offset.zero,
+                          ).animate(animation);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
                             child: child,
                           );
                         } else {
@@ -96,7 +103,9 @@ class LayoutPage extends StatelessWidget {
                               );
                             }
                           },
-                          child: const DownloadPage(),
+                          child: DownloadPage(
+                            playlists: playlistCubit.playlists,
+                          ),
                         ),
                       );
                     },

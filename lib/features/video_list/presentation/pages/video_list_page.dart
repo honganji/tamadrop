@@ -61,25 +61,6 @@ class VideoListPage extends StatelessWidget {
                 },
               ),
             ),
-            BlocBuilder<ProgressCubit, double>(
-              builder: (context, progress) {
-                return Container(
-                  margin: const EdgeInsets.all(32),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "Progress: ",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text("${(progress).toStringAsFixed(1)} %")
-                    ],
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),

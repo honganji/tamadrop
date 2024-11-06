@@ -78,12 +78,14 @@ class SqfliteStorageRepo implements StorageRepo {
   }
 
   @override
-  Future<void> storeVideo(LocalVideo video, int pid) async {
+  Future<void> storeVideo(LocalVideo video, int? pid) async {
     if (db != null) {
       await db!.insert('videos', video.toJson());
       // this is to add to all
-      await db!.insert('playlist_videos', {'pid': pid, 'vid': _allPid});
-      await db!.insert('playlist_videos', {'pid': pid, 'vid': video.vid});
+      await db!.insert('playlist_videos', {'pid': _allPid, 'vid': video.vid});
+      if (pid != null) {
+        await db!.insert('playlist_videos', {'pid': pid, 'vid': video.vid});
+      }
     } else {
       throw Exception("Database is not initialized properly...");
     }
