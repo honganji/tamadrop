@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
-import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
 import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
 import 'package:tamadrop/features/player/presentation/cubits/video_player_states.dart';
 import 'package:tamadrop/features/playlist/domain/entities/playlist.dart';

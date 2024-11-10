@@ -56,8 +56,7 @@ class LayoutPage extends StatelessWidget {
                           (Widget child, Animation<double> animation) {
                         if (child is VideoListPage) {
                           final offsetAnimation = Tween<Offset>(
-                            begin:
-                                const Offset(1.0, 0.0), // Slide in from right
+                            begin: const Offset(1.0, 0.0),
                             end: Offset.zero,
                           ).animate(animation);
 

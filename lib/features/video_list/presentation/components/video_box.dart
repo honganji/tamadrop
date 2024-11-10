@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:tamadrop/features/download/domain/entities/video.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
-import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
 import 'package:tamadrop/features/player/presentation/pages/video_player_page.dart';
 
 class VideoBox extends StatelessWidget {
@@ -29,7 +28,6 @@ class VideoBox extends StatelessWidget {
     final DateFormat formatter = DateFormat('d/M/yyyy HH:mm:ss');
     final String formattedDate = formatter.format(localVideo.createdAt);
     final videoCubit = context.read<VideoCubit>();
-    final videoPlayerCubit = context.read<VideoPlayerCubit>();
     return BlocBuilder<VideoCubit, VideoState>(builder: (context, state) {
       if (state is VideoDeleting && state.vid == localVideo.vid) {
         return const Center(child: CircularProgressIndicator());
@@ -54,7 +52,6 @@ class VideoBox extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => VideoPlayerPage(
-                              videoPaths: videoPlayerCubit.videoList,
                               index: index,
                             )));
               },
@@ -138,7 +135,7 @@ class VideoBox extends StatelessWidget {
                               onPressed: () {
                                 Navigator.of(context).pop(); // Close the dialog
                               },
-                              child: Text('Cancel'),
+                              child: const Text('Cancel'),
                             ),
                             TextButton(
                               onPressed: () {

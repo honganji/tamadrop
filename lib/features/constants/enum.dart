@@ -1,1 +1,0 @@
-enum Page { playlistPage, playlistBox }

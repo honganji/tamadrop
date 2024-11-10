@@ -4,7 +4,7 @@ import 'package:tamadrop/features/download/presentation/components/my_text_field
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_states.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
-import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
+import 'package:tamadrop/features/download/presentation/cubits/progress_cubit.dart';
 import 'package:tamadrop/features/playlist/domain/entities/playlist.dart';
 
 class DownloadPage extends StatefulWidget {
@@ -36,7 +36,6 @@ class _DownloadPageState extends State<DownloadPage> {
       if (url.isEmpty) {
         layoutCubit.emitError("The url is empty...");
       } else {
-        // TODO enable to choose which playlist to add to
         videoCubit.downloadVideo(url, selectedOption);
       }
     }

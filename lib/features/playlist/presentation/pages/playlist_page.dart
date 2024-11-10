@@ -13,7 +13,6 @@ class PlaylistPage extends StatelessWidget {
     final playlistCubit = context.read<PlaylistCubit>();
     playlistCubit.getAllPlaylists();
 
-    // TODO show snackbar if there is an error when you add
     return BlocBuilder<PlaylistCubit, PlaylistState>(
       builder: (context, state) {
         if (state is PlaylistLoaded) {

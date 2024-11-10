@@ -6,8 +6,7 @@ import 'package:tamadrop/features/storage/data/sqflite_storage_repo.dart';
 class VideoPlayerCubit extends Cubit<VideoPlayerState> {
   final SqfliteStorageRepo sqfliteStorageRepo;
   List<LocalVideo>? _videoLists;
-  VideoPlayerCubit({required this.sqfliteStorageRepo})
-      : super(VideoPlayerInitial());
+  VideoPlayerCubit(this.sqfliteStorageRepo) : super(VideoPlayerInitial());
 
   List<LocalVideo> get videoList => _videoLists ?? [];
 
@@ -24,7 +23,7 @@ class VideoPlayerCubit extends Cubit<VideoPlayerState> {
   Future<void> getCategorizedVideo(int pid) async {
     try {
       emit(VideoPlayerLoading());
-      _videoLists = await sqfliteStorageRepo.getAllVideos();
+      _videoLists = await sqfliteStorageRepo.getCategorizedVideo(pid);
       emit(VideoPlayerLoaded(_videoLists!));
     } catch (e) {
       emit(VideoPlayerError(e.toString()));

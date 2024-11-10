@@ -6,7 +6,7 @@ import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tamadrop/features/download/domain/entities/video.dart';
 import 'package:tamadrop/features/download/domain/repos/video_repo.dart';
-import 'package:tamadrop/features/layout/presentation/cubits/progress_cubit.dart';
+import 'package:tamadrop/features/download/presentation/cubits/progress_cubit.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
