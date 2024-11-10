@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/download/presentation/cubits/video_cubit.dart';
@@ -27,7 +29,8 @@ class VideoListPage extends StatelessWidget {
         child: Column(
           children: [
             BlocListener<VideoCubit, void>(
-              listener: (context, state) => videoPlayerCubit.getAllVideos(),
+              listener: (context, state) =>
+                  videoPlayerCubit.getCategorizedVideo(pid),
               child: BlocConsumer<VideoPlayerCubit, VideoPlayerState>(
                 builder: (context, state) {
                   if (state is VideoPlayerLoaded) {

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/layout/presentation/cubits/layout_cubit.dart';
+import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
 import 'package:tamadrop/features/playlist/domain/entities/playlist.dart';
 import 'package:tamadrop/features/video_list/presentation/pages/video_list_page.dart';
 
 class PlaylistBox extends StatelessWidget {
   final Playlist playlist;
-  const PlaylistBox({required this.playlist, super.key});
+  final ValueNotifier<bool> playNotifier;
+  const PlaylistBox(
+      {required this.playlist, required this.playNotifier, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +43,18 @@ class PlaylistBox extends StatelessWidget {
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () {
-                  // TODO play playlist
-                  print("play playlist");
+                onTap: () async {
+                  final videoPlayerCubit = context.read<VideoPlayerCubit>();
+                  await videoPlayerCubit.getCategorizedVideo(playlist.pid);
+                  if (videoPlayerCubit.videoList.isNotEmpty) {
+                    playNotifier.value = true;
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('No video in the playlist'),
+                      ),
+                    );
+                  }
                 },
                 child: Icon(
                   Icons.play_circle,

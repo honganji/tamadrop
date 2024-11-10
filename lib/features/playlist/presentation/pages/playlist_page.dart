@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tamadrop/features/constants/size.dart';
+import 'package:tamadrop/features/player/presentation/cubits/video_player_cubit.dart';
+import 'package:tamadrop/features/player/presentation/cubits/video_player_states.dart';
+import 'package:tamadrop/features/player/presentation/pages/video_player_page.dart';
 import 'package:tamadrop/features/playlist/presentation/components/playlist_box.dart';
 import 'package:tamadrop/features/playlist/presentation/cubits/playlist_cubit.dart';
 import 'package:tamadrop/features/playlist/presentation/cubits/playlist_states.dart';
@@ -11,85 +14,113 @@ class PlaylistPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final playlistCubit = context.read<PlaylistCubit>();
+    final ValueNotifier<bool> playNotifier = ValueNotifier<bool>(false);
     playlistCubit.getAllPlaylists();
 
-    return BlocBuilder<PlaylistCubit, PlaylistState>(
+    return BlocConsumer<VideoPlayerCubit, VideoPlayerState>(
       builder: (context, state) {
-        if (state is PlaylistLoaded) {
-          final playlists = playlistCubit.playlists;
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: constraints.maxHeight -
-                            BOTTOM_SAFE_AREA -
-                            56, // 56 is the height of the button
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: playlists.length,
-                        itemBuilder: (context, index) {
-                          final playlist = playlists[index];
-                          return PlaylistBox(playlist: playlist);
-                        },
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            final TextEditingController textController =
-                                TextEditingController();
-                            return AlertDialog(
-                              title: const Text('Add Playlist'),
-                              content: TextField(
-                                controller: textController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Playlist Name',
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pop(); // Close the dialog
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    final String name = textController.text;
-                                    if (name.isNotEmpty) {
-                                      playlistCubit.addPlaylist(name);
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog
-                                    }
-                                  },
-                                  child: const Text('Add'),
-                                ),
-                              ],
+        return BlocBuilder<PlaylistCubit, PlaylistState>(
+          builder: (context, state) {
+            if (state is PlaylistLoaded) {
+              final playlists = playlistCubit.playlists;
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: constraints.maxHeight -
+                                BOTTOM_SAFE_AREA -
+                                56, // 56 is the height of the button
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: playlists.length,
+                            itemBuilder: (context, index) {
+                              final playlist = playlists[index];
+                              return PlaylistBox(
+                                playlist: playlist,
+                                playNotifier: playNotifier,
+                              );
+                            },
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                final TextEditingController textController =
+                                    TextEditingController();
+                                return AlertDialog(
+                                  title: const Text('Add Playlist'),
+                                  content: TextField(
+                                    controller: textController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Playlist Name',
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        final String name = textController.text;
+                                        if (name.isNotEmpty) {
+                                          playlistCubit.addPlaylist(name);
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog
+                                        }
+                                      },
+                                      child: const Text('Add'),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      child: const Text('Add Playlist'),
+                          style: ElevatedButton.styleFrom(
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 1,
+                            ),
+                            shadowColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            elevation: 5,
+                          ),
+                          child: const Text('Add Playlist'),
+                        ),
+                        const SizedBox(
+                          height: BOTTOM_SAFE_AREA,
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      height: BOTTOM_SAFE_AREA,
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
-            },
-          );
-        } else {
-          return const SafeArea(
-            child: CircularProgressIndicator(),
+            } else {
+              return const SafeArea(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        );
+      },
+      listener: (context, state) {
+        if (playNotifier.value && state is VideoPlayerLoaded) {
+          playNotifier.value = false;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const VideoPlayerPage(index: 0),
+            ),
           );
         }
       },

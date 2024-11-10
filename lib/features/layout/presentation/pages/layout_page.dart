@@ -110,6 +110,14 @@ class LayoutPage extends StatelessWidget {
                     },
                   );
                 },
+                style: ElevatedButton.styleFrom(
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 1,
+                  ),
+                  shadowColor: Theme.of(context).colorScheme.inversePrimary,
+                  elevation: 5,
+                ),
                 child: const Icon(Icons.download),
               ),
             ),

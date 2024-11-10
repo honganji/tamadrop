@@ -54,8 +54,6 @@ class SqfliteStorageRepo implements StorageRepo {
     ''');
         // Insert initial values into the playlists table
         await db.insert('playlists', {'name': 'all'});
-        await db.insert('playlists', {'name': 'pop'});
-        await db.insert('playlists', {'name': 'love'});
       },
     );
     _getAllPlaylistIdByName("all");
